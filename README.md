@@ -72,9 +72,12 @@ from `GITHUB_REPOSITORY`.
 
 1. Create an empty public GitHub repository named
    `nrf52840-dongle-kicad` under the `binloan` account.
-2. Push this folder's `main` branch to it.
-3. In **Settings → Pages → Build and deployment**, select **GitHub Actions**.
-4. Run or re-run **Publish KiCad PCM repository** under **Actions**.
+2. In the empty repository, open **Settings → Pages → Build and deployment**
+   and select **GitHub Actions**. This one-time step must be completed before
+   the Pages workflow can configure or deploy the site.
+3. Push this folder's `main` branch to it.
+4. If the first workflow started before Pages was enabled, re-run
+   **Publish KiCad PCM repository** under **Actions**.
 5. Open the deployed Pages URL. It shows the exact `repository.json` URL to
    add in KiCad.
 
