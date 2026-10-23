@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1900" width="2400" height="1900" role="img" aria-labelledby="title desc">
+<title id="title">PCA10059 KiCad visual verification sheet</title>
+<desc id="desc">Combined footprint, mechanical, and schematic symbol views generated from the delivered KiCad library.</desc>
+<rect width="2400" height="1900" fill="#F4F7FB"/>
+<text x="90" y="88" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#172033">PCA10059 KiCad part — visual verification sheet</text>
+<text x="90" y="138" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#637083">All views are generated from the delivered symbol, footprint, and pinout files.</text>
+<image href="footprint_top.svg" x="90" y="190" width="2220" height="1172" preserveAspectRatio="xMidYMid meet"/>
+<image href="mechanical_dimensions.svg" x="90" y="1130" width="1380" height="767" preserveAspectRatio="xMidYMid meet"/>
+<image href="schematic_symbol.svg" x="1490" y="1130" width="820" height="767" preserveAspectRatio="xMidYMid meet"/>
+</svg>

@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "PCA10059_nRF52840_Dongle")(type "KiCad")(uri "${KIPRJMOD}/PCA10059_KiCad_Library/PCA10059_nRF52840_Dongle.kicad_sym")(options "")(descr "Nordic PCA10059 nRF52840 USB Dongle module"))
+)

@@ -1,0 +1,8 @@
+* text=auto
+*.kicad_sym text eol=lf
+*.kicad_mod text eol=lf
+*.csv text eol=lf
+*.svg text eol=lf
+*.png binary
+*.zip binary
+

@@ -1,0 +1,23 @@
+Pin,Signal,Physical location,Electrical type,Original designator
+1,GND,Top row leftmost,Power input,GND3
+2,P0.10,Top row,Bidirectional,0.10
+3,P0.09,Top row,Bidirectional,0.09
+4,P1.00,Top row,Bidirectional,1.00
+5,P0.24,Top row,Bidirectional,0.24
+6,P0.22,Top row,Bidirectional,0.22
+7,P0.20,Top row,Bidirectional,0.20
+8,P0.17,Top row,Bidirectional,0.17
+9,P0.15,Top row,Bidirectional,0.15
+10,P0.13,Top row rightmost,Bidirectional,0.13
+11,SWDIO,Upper USB-neck edge,Bidirectional,SWDIO
+12,SWDCLK,Lower USB-neck edge,Input,SWDCLK
+13,VBUS,Bottom row rightmost,Power input,VBUS1
+14,VDD_OUT,Bottom row,Power output,VDD OUT
+15,GND,Bottom row,Power input,GND1
+16,P0.31,Bottom row,Bidirectional,0.31
+17,P0.29,Bottom row,Bidirectional,0.29
+18,P0.02,Bottom row,Bidirectional,0.02
+19,P1.15,Bottom row,Bidirectional,1.15
+20,P1.13,Bottom row,Bidirectional,1.13
+21,P1.10,Bottom row,Bidirectional,1.10
+22,GND,Bottom row leftmost,Power input,GND2

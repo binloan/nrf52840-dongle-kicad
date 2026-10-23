@@ -1,0 +1,25 @@
+name: Validate library
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build and validate PCM package
+        run: python scripts/build_pcm.py --github-repository "$GITHUB_REPOSITORY"
+
+      - name: List package contents
+        run: python -m zipfile --list dist/packages/*.zip
+
