@@ -2,6 +2,12 @@
 
 All notable changes to this library are documented here.
 
+## 2.1.0 (2026-11-15)
+
+- Move the "PCA10059" and "USB" texts from F.SilkS to F.Fab. They sat under
+  the soldered dongle, and boards that keep part labels only on silkscreen
+  can now update the footprint from the library without manual edits.
+
 ## 2.0.0 (2026-11-15)
 
 - Fix the mirrored footprint. Version 1.0.0 placed pads 1 to 10 on the row

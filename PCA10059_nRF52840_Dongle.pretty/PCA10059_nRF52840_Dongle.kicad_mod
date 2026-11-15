@@ -22,14 +22,14 @@
   )
   (fp_text user "PCA10059"
     (at 0 0 0)
-    (layer "F.SilkS")
+    (layer "F.Fab")
     (effects
       (font (size 1.2 1.2) (thickness 0.2))
     )
   )
   (fp_text user "USB"
     (at 15.82 0 90)
-    (layer "F.SilkS")
+    (layer "F.Fab")
     (effects
       (font (size 1.0 1.0) (thickness 0.18))
     )
