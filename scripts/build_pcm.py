@@ -254,7 +254,7 @@ def main() -> None:
             "homepage": github_url,
             "documentation": f"{github_url}#readme",
         },
-        "tags": ["nrf52840", "pca10059", "module", "footprint", "symbol", "3d-model"],
+        "tags": ["nrf52840", "pca10059", "module", "footprint", "symbol", "step-model"],
         "versions": [
             {
                 "version": version,
@@ -263,6 +263,12 @@ def main() -> None:
             }
         ],
     }
+
+    # KiCad's PCM v2 schema: a tag starts with a letter; one bad tag stops KiCad
+    # from reading the whole repository.
+    bad_tags = [t for t in package_metadata["tags"] if not re.fullmatch(r"[a-z][-a-z0-9]{0,48}[a-z0-9]", t)]
+    if bad_tags:
+        raise ValueError(f"Tags rejected by the KiCad PCM schema: {bad_tags}")
 
     output = args.output.resolve()
     if output.exists():
