@@ -27,6 +27,11 @@ SYMBOL = ROOT / "PCA10059_nRF52840_Dongle.kicad_sym"
 FOOTPRINT_DIR = ROOT / "PCA10059_nRF52840_Dongle.pretty"
 FOOTPRINT = FOOTPRINT_DIR / "PCA10059_nRF52840_Dongle.kicad_mod"
 PINOUT = ROOT / "pinout.csv"
+MODEL_DIR = ROOT / "PCA10059_nRF52840_Dongle.3dshapes"
+MODEL = MODEL_DIR / "PCA10059_nRF52840_Dongle.step"
+# Source footprints reference the model for a project-local clone (see fp-lib-table);
+# the PCM package rewrites the path to the installed 3dmodels directory.
+SOURCE_MODEL_PATH = "${KIPRJMOD}/PCA10059_KiCad_Library/PCA10059_nRF52840_Dongle.3dshapes/PCA10059_nRF52840_Dongle.step"
 VERSION_FILE = ROOT / "VERSION"
 
 PACKAGE_NAME = "PCA10059 nRF52840 USB Dongle Library"
@@ -36,8 +41,8 @@ DESCRIPTION_FULL = (
     "A simplified 22-pin KiCad symbol and host-board footprint for mounting "
     "the Nordic Semiconductor PCA10059 nRF52840 USB Dongle as a castellated "
     "module. Includes the exact module outline, USB envelope, antenna keepout, "
-    "pin numbering, and SWD contacts. It does not reproduce the dongle's "
-    "internal circuitry."
+    "pin numbering, SWD contacts and a STEP model of the assembled dongle. It "
+    "does not reproduce the dongle's internal circuitry."
 )
 SCHEMA_URL = "https://go.kicad.org/pcm/schemas/v2"
 
@@ -122,7 +127,7 @@ def blocks(text: str, token: str) -> list[str]:
 
 
 def validate_library() -> None:
-    missing = [path for path in (SYMBOL, FOOTPRINT, PINOUT, VERSION_FILE) if not path.is_file()]
+    missing = [path for path in (SYMBOL, FOOTPRINT, PINOUT, VERSION_FILE, MODEL) if not path.is_file()]
     if missing:
         raise FileNotFoundError("Missing required files: " + ", ".join(map(str, missing)))
 
@@ -136,6 +141,8 @@ def validate_library() -> None:
         raise ValueError("pinout.csv pin numbers must be exactly 1 through 22")
 
     footprint_text = FOOTPRINT.read_text(encoding="utf-8")
+    if f'(model "{SOURCE_MODEL_PATH}"' not in footprint_text:
+        raise ValueError("Footprint does not reference the packaged STEP model")
     pad_numbers = {
         int(match.group(1))
         for block in blocks(footprint_text, "pad")
@@ -143,6 +150,18 @@ def validate_library() -> None:
     }
     if pad_numbers != expected_numbers:
         raise ValueError(f"Footprint pad numbers differ from 1..22: {sorted(pad_numbers)}")
+    # Orientation guard. KiCad y points down. Nordic's pick-and-place file (top view,
+    # USB plug right, y up) puts GND3 and P0.10 to P0.13 at y = +7.683 and VBUS, VDD OUT
+    # and P0.31 to P1.10 at y = -7.683, so pins 1 to 10 and SWDIO belong at negative y.
+    pad_y = {
+        int(match.group(1)): float(match.group(2))
+        for block in blocks(footprint_text, "pad")
+        if (match := re.match(r'^\(pad\s+"(\d+)"\s+smd\s+roundrect\s+\(at\s+[-\d.]+\s+([-\d.]+)', block))
+    }
+    upper = set(range(1, 12))
+    misplaced = sorted(n for n, y in pad_y.items() if (y < 0) != (n in upper))
+    if misplaced:
+        raise ValueError(f"Pads on the wrong side of the module centreline: {misplaced}")
 
     symbol_text = SYMBOL.read_text(encoding="utf-8")
     symbol_pins: dict[int, str] = {}
@@ -183,10 +202,15 @@ def build_package_archive(path: Path, metadata: dict[str, object]) -> int:
     if source_nickname not in source_symbol:
         raise ValueError("Cannot rewrite the source footprint nickname for PCM")
     pcm_symbol = source_symbol.replace(source_nickname, pcm_nickname, 1).encode("utf-8")
+    # KiCad installs package 3D models under 3dmodels/<identifier with dots as underscores>/.
+    model_dir = str(metadata["identifier"]).replace(".", "_")
+    pcm_model_path = f"${{KICAD10_3RD_PARTY}}/3dmodels/{model_dir}/{MODEL.name}"
+    pcm_footprint = FOOTPRINT.read_text(encoding="utf-8").replace(SOURCE_MODEL_PATH, pcm_model_path, 1).encode("utf-8")
     members = {
         "metadata.json": json_bytes(metadata),
         f"symbols/{SYMBOL.name}": pcm_symbol,
-        f"footprints/{FOOTPRINT_DIR.name}/{FOOTPRINT.name}": FOOTPRINT.read_bytes(),
+        f"footprints/{FOOTPRINT_DIR.name}/{FOOTPRINT.name}": pcm_footprint,
+        f"3dmodels/{MODEL.name}": MODEL.read_bytes(),
     }
     with zipfile.ZipFile(path, "w") as archive:
         for name in sorted(members):
@@ -230,7 +254,7 @@ def main() -> None:
             "homepage": github_url,
             "documentation": f"{github_url}#readme",
         },
-        "tags": ["nrf52840", "pca10059", "module", "footprint", "symbol"],
+        "tags": ["nrf52840", "pca10059", "module", "footprint", "symbol", "3d-model"],
         "versions": [
             {
                 "version": version,
@@ -308,6 +332,7 @@ a{{color:#145ea8}} img{{max-width:100%}}
         "metadata.json",
         f"symbols/{SYMBOL.name}",
         f"footprints/{FOOTPRINT_DIR.name}/{FOOTPRINT.name}",
+        f"3dmodels/{MODEL.name}",
     }
     if names != required:
         raise ValueError(f"Unexpected package contents: {sorted(names)}")

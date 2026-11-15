@@ -243,14 +243,14 @@ def render_footprint(pads, fab_lines, pinout):
     heading(c, "PCA10059 carrier footprint — top view", "USB plug points right • pin 1 is upper-left • dimensions in millimetres")
     scale, cx, cy = 27.5, 900, 455
     tx = lambda x: cx + x * scale
-    ty = lambda y: cy - y * scale
+    ty = lambda y: cy + y * scale  # KiCad y points down
     outline_mm = [fab_lines[0][0]] + [line[1] for line in fab_lines]
     outline_px = [(tx(x), ty(y)) for x, y in outline_mm[:-1]]
     c.polygon(outline_px, fill=BOARD, stroke=BOARD_EDGE, sw=4)
-    hatch(c, tx(-23.02002), ty(7.62), 8.0 * scale, 15.24 * scale)
+    hatch(c, tx(-23.02002), ty(-7.62), 8.0 * scale, 15.24 * scale)
     c.text(tx(-19.02), cy - 12, "ANTENNA", size=20, fill=KEEP, bold=True)
     c.text(tx(-19.02), cy + 18, "NO COPPER BELOW", size=14, fill=KEEP)
-    c.rect(tx(8.61822), ty(6.00964), (23.02002 - 8.61822) * scale, 12.01928 * scale, fill="#BCD0E6", opacity=0.35)
+    c.rect(tx(8.61822), ty(-6.00964), (23.02002 - 8.61822) * scale, 12.01928 * scale, fill="#BCD0E6", opacity=0.35)
     c.text(tx(17.0), cy, "USB PLUG\nENVELOPE".replace("\n", " / "), size=18, fill=BOARD_EDGE, bold=True)
 
     for pad in pads:
@@ -260,16 +260,16 @@ def render_footprint(pads, fab_lines, pinout):
         c.circle(x, y, 3, fill=PAD_EDGE)
         c.text(x, y, str(pad["number"]), size=15, fill="#FFFFFF", bold=True)
 
-    top = [p for p in pads if abs(p["y"] - 7.62) < 0.01]
-    bottom = [p for p in pads if abs(p["y"] + 7.62) < 0.01]
+    top = [p for p in pads if abs(p["y"] + 7.62) < 0.01]
+    bottom = [p for p in pads if abs(p["y"] - 7.62) < 0.01]
     for pad in top:
         x = tx(pad["x"])
-        c.line(x, ty(8.85), x, 182, stroke=GRID, sw=1)
+        c.line(x, ty(-8.85), x, 182, stroke=GRID, sw=1)
         c.text(x, 158, f'{pad["number"]}', size=16, fill=PAD_EDGE, bold=True)
         c.text(x, 180, pinout[pad["number"]]["Signal"], size=14, fill=INK)
     for pad in bottom:
         x = tx(pad["x"])
-        c.line(x, ty(-8.85), x, 748, stroke=GRID, sw=1)
+        c.line(x, ty(8.85), x, 748, stroke=GRID, sw=1)
         c.text(x, 765, pinout[pad["number"]]["Signal"], size=14, fill=INK)
         c.text(x, 787, f'{pad["number"]}', size=16, fill=PAD_EDGE, bold=True)
 
@@ -298,7 +298,7 @@ def render_mechanical(pads, fab_lines, pinout):
     heading(c, "PCA10059 mechanical verification", "Exact F.Fab outline and pad centres • host land sizes shown in orange")
     scale, cx, cy = 27.5, 925, 425
     tx = lambda x: cx + x * scale
-    ty = lambda y: cy - y * scale
+    ty = lambda y: cy + y * scale  # KiCad y points down
     outline_mm = [fab_lines[0][0]] + [line[1] for line in fab_lines]
     outline_px = [(tx(x), ty(y)) for x, y in outline_mm[:-1]]
     c.polygon(outline_px, fill="#FFFFFF", stroke=BOARD_EDGE, sw=4)
@@ -314,14 +314,14 @@ def render_mechanical(pads, fab_lines, pinout):
     c.line(cx, cy - 18, cx, cy + 18, stroke=KEEP, sw=2)
 
     y_overall = 830
-    c.line(tx(-23.02002), ty(-7.62), tx(-23.02002), y_overall, stroke=GRID, sw=1)
-    c.line(tx(23.02002), ty(-6.00964), tx(23.02002), y_overall, stroke=GRID, sw=1)
+    c.line(tx(-23.02002), ty(7.62), tx(-23.02002), y_overall, stroke=GRID, sw=1)
+    c.line(tx(23.02002), ty(6.00964), tx(23.02002), y_overall, stroke=GRID, sw=1)
     arrow_h(c, tx(-23.02002), tx(23.02002), y_overall, "46.04")
     y_body = 755
-    c.line(tx(7.00786), ty(-7.62), tx(7.00786), y_body, stroke=GRID, sw=1)
+    c.line(tx(7.00786), ty(7.62), tx(7.00786), y_body, stroke=GRID, sw=1)
     arrow_h(c, tx(-23.02002), tx(7.00786), y_body, "30.03 body")
     y_usb = 700
-    c.line(tx(8.61822), ty(-6.00964), tx(8.61822), y_usb, stroke=GRID, sw=1)
+    c.line(tx(8.61822), ty(6.00964), tx(8.61822), y_usb, stroke=GRID, sw=1)
     arrow_h(c, tx(8.61822), tx(23.02002), y_usb, "14.40 USB tongue")
     x_width = 180
     c.line(x_width, ty(7.62), tx(-23.02002), ty(7.62), stroke=GRID, sw=1)

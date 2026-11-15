@@ -104,6 +104,8 @@ and the Pages workflow follows GitHub's official
 - `PCA10059_nRF52840_Dongle.kicad_sym` — 22-pin schematic symbol.
 - `PCA10059_nRF52840_Dongle.pretty/PCA10059_nRF52840_Dongle.kicad_mod` —
   host-board land pattern, exact module outline, courtyard, and silkscreen.
+- `PCA10059_nRF52840_Dongle.3dshapes/PCA10059_nRF52840_Dongle.step`: STEP
+  model of the assembled dongle, attached to the footprint.
 - `pinout.csv` — machine-readable pin map.
 - `visuals/` — generated footprint, mechanical, and symbol verification views.
 - `render_visuals.py` — regenerates the verification images.
@@ -113,7 +115,7 @@ and the Pages workflow follows GitHub's official
 ## Orientation and pin numbering
 
 View is from the top of the dongle, with the USB plug pointing right. Pin 1 is
-marked at the upper-left. Pins run counter-clockwise around the module:
+marked at the upper-left. Pins run clockwise around the module:
 
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
@@ -159,8 +161,11 @@ marker are on `F.SilkS`.
 - Connect all three GND pins to the carrier ground.
 - The underside USB `D+`, `D-`, `VBUS2`, and `UGND` test pads are intentionally
   omitted because they are not castellated module contacts.
-- No 3D model is included. Check component height and enclosure clearance
-  against the physical dongle.
+- The footprint carries a STEP model of the assembled dongle: board body
+  plus Nordic's component models, components facing up. A clone resolves
+  it through `${KIPRJMOD}/PCA10059_KiCad_Library/`, as in `fp-lib-table`;
+  the PCM package installs it under `${KICAD10_3RD_PARTY}/3dmodels/`.
+  Confirm enclosure clearance against a physical dongle.
 
 ## Source and verification
 
@@ -176,10 +181,22 @@ revision 2.1.1 files:
 `scripts/build_pcm.py` independently verifies that the CSV, symbol, and
 footprint all contain matching pins/pads 1–22 before publication.
 
+The STEP model comes from the same revision 2.1.1 package. KiCad 10.0.6
+imported `400250.PcbDoc` with `kicad-cli pcb import --format altium`, which
+keeps the part models embedded in the Altium board, and exported it with
+`kicad-cli pcb export step --user-origin 148.501x105.004mm`. That origin is
+the centre of the 46.04 mm length on the board centreline, the footprint
+origin, so the model needs no offset or rotation. A render on a carrier board
+showed the castellations on the host pads and the USB tongue on the `F.Fab`
+outline.
+
 ## Licence and attribution
 
 The original source package is Copyright © 2010–2021 Nordic Semiconductor ASA.
 The derived library is distributed under the retained terms in `LICENSE.txt`,
 including the requirement that it be used only with a Nordic Semiconductor
 integrated circuit. Nordic Semiconductor does not endorse this repository.
+
+The STEP model contains the component models embedded in Nordic's Altium
+board, some of which come from their component makers.
 
